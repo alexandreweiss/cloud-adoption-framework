@@ -385,27 +385,54 @@ This section provides different connectivity approaches to integrate an Azure to
 
 - OCI can be considered as a normal remote / branch site for your corporate network : you cannot use in OCI IP spaces that overlap with your existing addressing plan.
 
-- Connectivity between Azure and OCI can be addressed using 3 methods that are and/or options :
+- Connectivity between Azure and OCI happens using different path whether it is for business data exchange, administration ... These are and/or options :
 
-  - Azure Application workload to Oracle workload and vice-versa using Express Route (ExR) circuit : this is the direct / low latency cloud to cloud connectivity. Connection can land :
+  - **Azure Application workloads to Oracle workloads** and vice-versa using Express Route (ExR) circuit : this is the direct / low latency cloud to cloud connectivity.
+
+  - **Oracle workload operation** : this is usually RDP, SSH or even SQL Client connection
+
+- In the recommendations below, the use of Express Route Global Reach may incur additionnal bandwidth costs that can be identified using the [Azure Pricing Calculator](https://azure.microsoft.com/en-us/pricing/calculator/). This is especially true when you migration large quantity of data from on-premises to Oracle using ExR circuit.
+
+- In an Azure Regions that support [Availability Zones (AZ)](https://docs.microsoft.com/en-us/azure/availability-zones/az-overview#availability-zones), placing your Azure workloads in one zone or the other can have a small impact on latency.
+
+
+**Design recommendations:**
+
+- To **connect Azure Application and Oracle workloads**, you can use 
+  -  a single vNet with an ExR Gateway
+
+    SCHEMA
+
+  - an existing hub and spoke topology with an ExR Gateway that is shared with other ExR circuit to on-premises 
+
+    SCHEMA
+
+- To **operate Oracle resources hosted in OCI**, you can :    
+
+  - Use a jumpbox located in Azure. It can be 
+    - from an isolated vNet connected to OCI 
     
-    - on a single vNet with a dedicated ExR Gateway
+    SCHEMA 
+
+    - from a spoke vnet connected to your hub hosting the ExR Gateway to OCI
+
     SCHEMA
 
-    - on a hub and spoke architecture with a shared ExR Gateway that may be connected to other ExR circuit to on-premises 
+  - Connect from on-premises :
+
+     - You already have an ExR circuit to Azure : you can use Global Reach to bind existing ExR circuit to OCI ExR circuit. Microsoft router becomes the switching point between clouds.
+
+     SCHEMA
+
+    - You can leverage any cloud exchange provider you may already use to connect to Azure and buy from them a logical connector to OCI. Your edge router become the switching point between clouds.
+
     SCHEMA
 
-  - Oracle workload administration :
+- To obtain best latency, you should :
 
-    - From a jumpbox in Azure : you have to think about the routing especially if you have multiple ExR gateways
-    SCHEMA
+  - Enable [FastPath](https://docs.microsoft.com/en-us/azure/expressroute/about-fastpath) on your ExR Gateway whenever it is possible
 
-    - From on-premises :
-    SCHEMA
-
-      - You already have an ExR circuit to Azure : you can use Global Reach to bind existing ExR circuit to OCI ExR circuit. Microsoft router becomes the switching point between clouds.
-
-      - You can leverage any cloud exchange provider you may already use to connect to Azure and buy from them a logical connector to OCI. Your edge router become the switching point between clouds.
+  - if you target Azure Region that supports Availability Zones, test latency from VMs located in each of the 3 zones initiating tcp handshake to an Oracle VM.
 
 ## Plan for inbound and outbound internet connectivity
 
