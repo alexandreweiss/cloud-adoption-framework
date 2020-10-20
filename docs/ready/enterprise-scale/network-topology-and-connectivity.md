@@ -377,6 +377,36 @@ Building on the previous connectivity sections, this section explores recommende
 
 - We don't recommend that you implement forced tunneling to enable communication from Azure to Azure resources.
 
+## Connectivity to Oracle Cloud Infrastructure (OCI)
+
+This section provides different connectivity approaches to integrate an Azure to OCI connection into the Enterprise network topology.
+
+**Design considerations:**
+
+- OCI can be considered as a normal remote / branch site for your corporate network : you cannot use in OCI IP spaces that overlap with your existing addressing plan.
+
+- Connectivity between Azure and OCI can be addressed using 3 methods that are and/or options :
+
+  - Azure Application workload to Oracle workload and vice-versa using Express Route (ExR) circuit : this is the direct / low latency cloud to cloud connectivity. Connection can land :
+    
+    - on a single vNet with a dedicated ExR Gateway
+    SCHEMA
+
+    - on a hub and spoke architecture with a shared ExR Gateway that may be connected to other ExR circuit to on-premises 
+    SCHEMA
+
+  - Oracle workload administration :
+
+    - From a jumpbox in Azure : you have to think about the routing especially if you have multiple ExR gateways
+    SCHEMA
+
+    - From on-premises :
+    SCHEMA
+
+      - You already have an ExR circuit to Azure : you can use Global Reach to bind existing ExR circuit to OCI ExR circuit. Microsoft router becomes the switching point between clouds.
+
+      - You can leverage any cloud exchange provider you may already use to connect to Azure and buy from them a logical connector to OCI. Your edge router become the switching point between clouds.
+
 ## Plan for inbound and outbound internet connectivity
 
 This section describes recommended connectivity models for inbound and outbound connectivity to and from the public internet.
