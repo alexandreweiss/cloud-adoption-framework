@@ -385,25 +385,23 @@ This section provides different connectivity approaches to integrate an Azure to
 
 **Design considerations:**
 
-- OCI can be considered as a normal remote / branch site for your corporate network : you cannot use in OCI IP spaces that overlap with your existing addressing plan.
+- OCI can be considered as a normal remote / branch site for your corporate network : you cannot use in OCI, IP ranges that overlap with your existing addressing plan.
 
-- Connectivity between Azure and OCI happens using different path whether it is for business data exchange, administration ... These are and/or options :
+- Connectivity between Azure and OCI happens over different paths whether it is for business data exchange, administration ... These are and/or options :
 
   - **Azure Application workloads to Oracle workloads** and vice-versa using Express Route circuit : this is the direct / low latency cloud to cloud connectivity.
 
   - **Oracle workload operation** : this is usually RDP, SSH or even SQL Client connection
 
-- [FastPath](https://docs.microsoft.comazure/expressroute/about-fastpath) is designed to improve the data path performance between two networks. Here, between Azure and OCI. When enabled, FastPath sends network traffic directly to virtual machines in the virtual network, bypassing the Express Route gateway.
-  - FastPath requires Ultra Performance SKU/ErGw3AZ Express Gateway gateway
+- [FastPath](https://docs.microsoft.com/azure/expressroute/about-fastpath) is designed to improve the data path performance between two networks. Here, between Azure and OCI. When enabled, FastPath sends network traffic directly to virtual machines in the virtual network, bypassing the Express Route gateway.
+  - FastPath still requires Ultra Performance/ErGw3AZ SKU Express Route Gateway for route management,
   - If you terminate your Express Route circuit in a Virtual Wan Hub or if you have to cross vNet peerings, FastPast is not available in these scenarios.
 
-- [Azure Availability Zone](https://docs.microsoft.com/en-us/azure/availability-zones/az-overview#availability-zones) provides you with isolated facilities in the same region. It can impact latency so you need to design you application to balance availability and performances requirements.
+- In the recommendations below, the use of [Express Route Global Reach](https://docs.microsoft.com/azure/expressroute/expressroute-global-reach) may incur additionnal bandwidth costs that can be identified using the [Azure Pricing Calculator](https://azure.microsoft.com/pricing/calculator/). This is especially true when you migration large quantity of data from on-premises to Oracle using Express Route circuit.
 
-- In the recommendations below, the use of [Express Route Global Reach](https://docs.microsoft.com/en-us/azure/expressroute/expressroute-global-reach) may incur additionnal bandwidth costs that can be identified using the [Azure Pricing Calculator](https://azure.microsoft.com/pricing/calculator/). This is especially true when you migration large quantity of data from on-premises to Oracle using Express Route circuit.
+- In an Azure Regions that support [Availability Zones (AZ)](https://docs.microsoft.com/azure/availability-zones/az-overview#availability-zones), placing your Azure workloads in one zone or the other can have a small impact on latency. Design you application to balance availability and performances requirements.
 
-- In an Azure Regions that support [Availability Zones (AZ)](https://docs.microsoft.com/azure/availability-zones/az-overview#availability-zones), placing your Azure workloads in one zone or the other can have a small impact on latency.
-
-- For more in-depth documentation around which region OCI interconnect is available or   what Oracle application is supported in cross-cloud scenario, please refer to [Oracle Application solutions intergrating Microsoft Azure and Oracle Cloud Infrastructure](https://docs.microsoft.com/azure/virtual-machines/workloads/oracle/oracle-oci-overview)
+- For more in-depth documentation about region supporting OCI interconnect or what Oracle application is supported in cross-cloud scenario, please refer to [Oracle Application solutions intergrating Microsoft Azure and Oracle Cloud Infrastructure](https://docs.microsoft.com/azure/virtual-machines/workloads/oracle/oracle-oci-overview)
 
 
 **Design recommendations:**
@@ -413,7 +411,7 @@ This section provides different connectivity approaches to integrate an Azure to
 
 ![Diagram that shows Azure to OCI - single vNet.](./media/azure-oci-one-vnet.png)
 
-  - an existing hub and spoke topology with an Express Route Gateway that may be connected to other Express Route circuits, FastPath NOT enabled
+  - an existing hub and spoke architecture with an Express Route Gateway that may be connected to other Express Route circuits, FastPath NOT enabled
 
 ![Diagram that shows Azure to OCI - Hub and Spoke.](./media/azure-oci-hub-and-spoke.png)
 
@@ -425,15 +423,15 @@ This section provides different connectivity approaches to integrate an Azure to
 
   - Connect from on-premises :
 
-     - You already have an Express Route circuit to Azure : use Global Reach to bind existing Express Route circuit to OCI Express Route circuit. Microsoft router becomes the central point between clouds.
+     - You already have an Express Route circuit to Azure : use Global Reach to bind existing Express Route circuit to OCI Express Route circuit. Microsoft router becomes the central routing point between clouds.
 
 ![Diagram that shows Azure to OCI - via Global Reach.](./media/azure-oci-gr-hub-and-spoke.png)
 
-    - You can leverage any cloud exchange provider you may already use to connect to Azure and buy from them a FastConnect directly to OCI.
+  - You can leverage any cloud exchange provider you may already use to connect to Azure and buy from them a FastConnect directly to OCI.
 
 ![Diagram that shows Azure to OCI - via CXP.](./media/azure-oci-cxp-hub-and-spoke.png)
 
-- Test latency to OCI from VMs located in different Azure Region Zones to get the most performant one out of the 3 in the region.
+- In any of those options, test latency to OCI from VMs located in different Azure Region Zones to get the most performant one out of the 3 in the region.
 
 ## Plan for inbound and outbound internet connectivity
 
